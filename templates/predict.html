@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}New Prediction | Phenology Model{% endblock %}
+{% block page_title %}New Prediction{% endblock %}
+
+{% block content %}
+
+{% if error %}
+<div class="alert-box">
+  <h4>❌ {{ error }}</h4>
+  <p class="tamil">{{ error_tamil }}</p>
+</div>
+{% endif %}
+
+<div class="panel form-panel">
+  <h3>📷 Image &amp; Temperature Input</h3>
+  <p class="muted">படம் மற்றும் வெப்பநிலை உள்ளீடு</p>
+
+  <form action="{{ url_for('predict') }}" method="POST" enctype="multipart/form-data">
+
+    <div class="field">
+      <label>📷 Upload Mango Image <span class="tamil">மாம்பழ படத்தை பதிவேற்றவும்</span></label>
+      <input type="file" name="image" accept=".png,.jpg,.jpeg" required>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>🌡 Maximum Temperature (°C) <span class="tamil">அதிகபட்ச வெப்பநிலை</span></label>
+        <input type="number" step="any" name="temp_max" placeholder="e.g. 34" required>
+      </div>
+      <div class="field">
+        <label>🌡 Minimum Temperature (°C) <span class="tamil">குறைந்தபட்ச வெப்பநிலை</span></label>
+        <input type="number" step="any" name="temp_min" placeholder="e.g. 22" required>
+      </div>
+    </div>
+
+    <button type="submit" class="btn-primary btn-block">🔍 Predict / கணிக்கவும்</button>
+
+  </form>
+</div>
+
+{% endblock %}

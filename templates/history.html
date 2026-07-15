@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}History | Phenology Model{% endblock %}
+{% block page_title %}Prediction History{% endblock %}
+
+{% block content %}
+
+<div class="panel">
+  <div class="panel-header-row">
+    <h3>📜 Prediction History <span class="tamil">கணிப்பு வரலாறு</span></h3>
+    <a href="{{ url_for('download') }}" class="btn-secondary">⬇ Export Excel</a>
+  </div>
+
+  {% if rows and rows|length > 0 %}
+  <div class="table-wrap">
+    <table class="summary-table history-table">
+      <tr>
+        {% for col in columns %}
+        <th>{{ col }}</th>
+        {% endfor %}
+      </tr>
+      {% for row in rows %}
+      <tr>
+        {% for col in columns %}
+        <td>{{ row[col] }}</td>
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <p>No predictions recorded yet.</p>
+    <a href="{{ url_for('predict_page') }}" class="btn-primary">Run your first prediction →</a>
+  </div>
+  {% endif %}
+
+</div>
+
+{% endblock %}

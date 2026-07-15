@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Dashboard | Phenology Model{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<section class="hero">
+  <div class="hero-text">
+    <span class="eyebrow">Mango Orchard Intelligence</span>
+    <h1>Temperature-Based Phenology Model<br>for Oriental Fruit Fly Detection</h1>
+    <p class="hero-sub">
+      Using Artificial Intelligence and Growing Degree Days (GDD) to identify infected mangoes
+      and predict the fruit fly's life stage before it spreads.
+    </p>
+    <p class="hero-sub tamil">
+      செயற்கை நுண்ணறிவு மற்றும் GDD மூலம் பாதிக்கப்பட்ட மாம்பழங்களை கண்டறிந்து,
+      பழ ஈயின் வளர்ச்சி நிலையை முன்கூட்டியே கணிக்கிறது.
+    </p>
+    <a href="{{ url_for('predict_page') }}" class="btn-primary">Start New Prediction →</a>
+  </div>
+
+  <div class="hero-stat-card">
+    <span class="stat-label">Predictions logged</span>
+    <span class="stat-number">{{ total_predictions }}</span>
+    <span class="stat-caption">stored in prediction_history.xlsx</span>
+  </div>
+</section>
+
+<section class="grid-2">
+
+  <div class="panel">
+    <h3>Project Objective</h3>
+    <p>
+      Oriental fruit fly (<em>Bactrocera dorsalis</em>) infestation is one of the most damaging
+      threats to mango cultivation. This system combines a trained image-classification model
+      with a temperature-driven Growing Degree Days calculation to flag infected fruit and
+      estimate which life stage the pest has likely reached &mdash; egg, larva, pupa, or adult.
+    </p>
+  </div>
+
+  <div class="panel">
+    <h3>Detection Flow</h3>
+    <ol class="flow-steps">
+      <li><span class="step-index">01</span> Upload mango image</li>
+      <li><span class="step-index">02</span> Mango verification</li>
+      <li><span class="step-index">03</span> Fruit fly detection</li>
+      <li><span class="step-index">04</span> Temperature input</li>
+      <li><span class="step-index">05</span> GDD calculation</li>
+      <li><span class="step-index">06</span> Risk analysis</li>
+      <li><span class="step-index">07</span> Recommendation &amp; report</li>
+    </ol>
+  </div>
+
+</section>
+
+{% endblock %}

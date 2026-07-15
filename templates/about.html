@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}About | Phenology Model{% endblock %}
+{% block page_title %}About This Project{% endblock %}
+
+{% block content %}
+
+<div class="panel">
+  <h3>Project Title</h3>
+  <p>Temperature-Based Phenology Model for Oriental Fruit Fly Detection in Mango</p>
+</div>
+
+<div class="grid-2">
+  <div class="panel">
+    <h3>Objective</h3>
+    <p>
+      To build an accessible, AI-assisted tool that helps mango farmers detect Oriental
+      fruit fly infestation early and understand the pest's likely life stage, so that
+      control measures can be applied at the right time.
+    </p>
+  </div>
+
+  <div class="panel">
+    <h3>Methodology</h3>
+    <p>
+      A convolutional neural network verifies the uploaded image is a mango, then a second
+      model classifies it as healthy or infected. Daily maximum and minimum temperatures are
+      used to calculate Growing Degree Days (GDD), which estimates the pest's developmental
+      stage and informs the risk level and recommendation shown to the farmer.
+    </p>
+  </div>
+</div>
+
+<div class="panel">
+  <h3>GDD Formula</h3>
+  <p class="mono formula">GDD = ((T_max + T_min) / 2) − Base Temperature (10°C)</p>
+</div>
+
+<div class="grid-2">
+  <div class="panel">
+    <h3>Student Details</h3>
+    <p class="muted">Add your name, register number, and degree programme here.</p>
+  </div>
+  <div class="panel">
+    <h3>Guide Details</h3>
+    <p class="muted">Add your project guide's name and designation here.</p>
+  </div>
+</div>
+
+<div class="panel">
+  <h3>Department</h3>
+  <p>Department of Agricultural Information Technology<br>Tamil Nadu Agricultural University</p>
+</div>
+
+{% endblock %}

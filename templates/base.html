@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Phenology Model | Oriental Fruit Fly Detection{% endblock %}</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+{% block head %}{% endblock %}
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-mark">🥭</span>
+      <div class="brand-text">
+        <strong>Phenology Model</strong>
+        <span>Oriental Fruit Fly · Mango</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="{{ url_for('dashboard') }}" class="{{ 'active' if active=='dashboard' else '' }}">
+        <span class="nav-icon">🏠</span> Dashboard
+      </a>
+      <a href="{{ url_for('predict_page') }}" class="{{ 'active' if active=='predict' else '' }}">
+        <span class="nav-icon">🔍</span> New Prediction
+      </a>
+      <a href="{{ url_for('history_page') }}" class="{{ 'active' if active=='history' else '' }}">
+        <span class="nav-icon">📜</span> Prediction History
+      </a>
+      <a href="{{ url_for('download') }}" class="{{ 'active' if active=='reports' else '' }}">
+        <span class="nav-icon">📄</span> Reports
+      </a>
+      <a href="{{ url_for('about_page') }}" class="{{ 'active' if active=='about' else '' }}">
+        <span class="nav-icon">ℹ️</span> About
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <span>Tamil Nadu Agricultural University</span>
+      <span class="muted">Dept. of Agricultural IT</span>
+    </div>
+  </aside>
+
+  <!-- ================= MAIN ================= -->
+  <div class="main-column">
+
+    <header class="topbar">
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+      <div class="topbar-title">{% block page_title %}Dashboard{% endblock %}</div>
+      <div class="topbar-right">
+        <span id="datetime"></span>
+        <button class="btn-lang">🌐 EN | த</button>
+      </div>
+    </header>
+
+    <main class="content">
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+      <span>🌾 Temperature-Based Phenology Model for Oriental Fruit Fly Detection in Mango</span>
+      <span class="muted">Using Artificial Intelligence and Growing Degree Days (GDD) · © 2026</span>
+    </footer>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>
