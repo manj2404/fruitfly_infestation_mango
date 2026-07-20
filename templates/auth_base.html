@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Phenology Model{% endblock %}</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="auth-body">
+
+<div class="auth-shell">
+
+  <div class="auth-art">
+    <div class="auth-art-inner">
+      <span class="auth-brand-mark">🥭</span>
+      <h1>Temperature-Based Phenology Model</h1>
+      <p>AI-assisted Oriental fruit fly detection for mango orchards, using Growing Degree Days and image-based analysis.</p>
+      <ul class="auth-highlights">
+        <li>🪰 Mango &amp; infection detection</li>
+        <li>🌡 GDD-based life-stage prediction</li>
+        <li>🌐 Full bilingual support (English &amp; தமிழ்)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="auth-form-side">
+    <div class="auth-card">
+      {% block auth_content %}{% endblock %}
+    </div>
+    <p class="auth-footnote">Tamil Nadu Agricultural University · Dept. of Agricultural Information Technology</p>
+  </div>
+
+</div>
+
+</body>
+</html>

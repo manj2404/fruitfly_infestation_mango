@@ -15,11 +15,24 @@
   <h3>📷 Image &amp; Temperature Input</h3>
   <p class="muted">படம் மற்றும் வெப்பநிலை உள்ளீடு</p>
 
-  <form action="{{ url_for('predict') }}" method="POST" enctype="multipart/form-data">
+  <form action="{{ url_for('predict') }}" method="POST" enctype="multipart/form-data" id="predictForm">
 
     <div class="field">
-      <label>📷 Upload Mango Image <span class="tamil">மாம்பழ படத்தை பதிவேற்றவும்</span></label>
-      <input type="file" name="image" accept=".png,.jpg,.jpeg" required>
+      <label>📷 Mango Image <span class="tamil">மாம்பழ படத்தை பதிவேற்றவும்</span></label>
+
+      <input type="file" id="mainImageInput" name="image" accept=".png,.jpg,.jpeg" style="display:none">
+      <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none">
+      <input type="file" id="galleryInput" accept=".png,.jpg,.jpeg" style="display:none">
+
+      <div class="upload-choice">
+        <button type="button" class="btn-secondary" id="captureBtn">📷 Capture Photo</button>
+        <button type="button" class="btn-secondary" id="galleryBtn">🖼️ Choose from Gallery</button>
+      </div>
+
+      <div id="imagePreviewWrap" class="image-preview-wrap">
+        <img id="imagePreview" class="image-preview" alt="Selected mango image preview">
+        <span id="imageFileName" class="image-filename"></span>
+      </div>
     </div>
 
     <div class="field-row">
@@ -38,4 +51,48 @@
   </form>
 </div>
 
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const mainInput = document.getElementById("mainImageInput");
+  const cameraInput = document.getElementById("cameraInput");
+  const galleryInput = document.getElementById("galleryInput");
+  const captureBtn = document.getElementById("captureBtn");
+  const galleryBtn = document.getElementById("galleryBtn");
+  const previewWrap = document.getElementById("imagePreviewWrap");
+  const previewImg = document.getElementById("imagePreview");
+  const previewName = document.getElementById("imageFileName");
+  const form = document.getElementById("predictForm");
+
+  function useFile(sourceInput) {
+    if (sourceInput.files && sourceInput.files.length > 0) {
+      mainInput.files = sourceInput.files;
+      const file = sourceInput.files[0];
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        previewImg.src = e.target.result;
+        previewName.textContent = file.name;
+        previewWrap.classList.add("active");
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  if (captureBtn) captureBtn.addEventListener("click", () => cameraInput.click());
+  if (galleryBtn) galleryBtn.addEventListener("click", () => galleryInput.click());
+  if (cameraInput) cameraInput.addEventListener("change", () => useFile(cameraInput));
+  if (galleryInput) galleryInput.addEventListener("change", () => useFile(galleryInput));
+
+  if (form) {
+    form.addEventListener("submit", function (e) {
+      if (!mainInput.files || mainInput.files.length === 0) {
+        e.preventDefault();
+        alert("Please capture or choose a mango image before predicting.\nமாம்பழ படத்தை தேர்ந்தெடுக்கவும்.");
+      }
+    });
+  }
+});
+</script>
 {% endblock %}

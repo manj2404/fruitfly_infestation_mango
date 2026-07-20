@@ -42,28 +42,92 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // ===============================
-// Voice Output (English)
+// Voice Output (Bilingual: English / Tamil)
 // ===============================
 
-function speakResult() {
-    let prediction = document.getElementById("predictionText");
-    if (prediction) {
-        let msg = new SpeechSynthesisUtterance(prediction.innerText);
-        msg.lang = "en-IN";
-        speechSynthesis.speak(msg);
+document.addEventListener("DOMContentLoaded", function () {
+    const panel = document.getElementById("voicePanel");
+    if (!panel) return; // not on the result page
+
+    const speakBtn = document.getElementById("speakBtn");
+    const stopBtn = document.getElementById("stopBtn");
+    const langEn = document.getElementById("langEn");
+    const langTa = document.getElementById("langTa");
+
+    const data = panel.dataset;
+
+    function buildEnglishSentence() {
+        const status = data.prediction === "HEALTHY" ? "healthy" : "infected";
+
+        return "The uploaded mango is " + status + ". " +
+            "Confidence is " + data.confidence + " percent. " +
+            "Fruit fly stage is " + data.stage + ". " +
+            "Risk level is " + data.risk.toLowerCase() + ". " +
+            "Recommendation: " + data.recommendation;
     }
-}
 
+    function buildTamilSentence() {
+        return "பதிவேற்றப்பட்ட மாம்பழம் " + data.predictionTamil + ". " +
+            "நம்பகத்தன்மை " + data.confidence + " சதவீதம். " +
+            "பழ ஈ நிலை " + data.stageTamil + ". " +
+            "ஆபத்து " + data.riskTamil + ". " +
+            "பரிந்துரை: " + data.recommendationTamil;
+    }
 
-// ===============================
-// Tamil Voice
-// ===============================
+    function getSelectedLang() {
+        return langTa && langTa.checked ? "ta" : "en";
+    }
 
-function speakTamil(text) {
-    let msg = new SpeechSynthesisUtterance(text);
-    msg.lang = "ta-IN";
-    speechSynthesis.speak(msg);
-}
+    function setSpeakingState(isSpeaking) {
+        stopBtn.disabled = !isSpeaking;
+        speakBtn.classList.toggle("is-speaking", isSpeaking);
+        speakBtn.textContent = isSpeaking ? "🔊 Speaking..." : "🔊 Speak Result";
+    }
+
+    function speak() {
+        if (!("speechSynthesis" in window)) {
+            alert("Sorry, your browser does not support voice output.");
+            return;
+        }
+
+        speechSynthesis.cancel(); // stop anything currently playing
+
+        const lang = getSelectedLang();
+        const text = lang === "ta" ? buildTamilSentence() : buildEnglishSentence();
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = lang === "ta" ? "ta-IN" : "en-IN";
+        utterance.rate = 0.95;
+
+        utterance.onstart = function () { setSpeakingState(true); };
+        utterance.onend = function () { setSpeakingState(false); };
+        utterance.onerror = function () { setSpeakingState(false); };
+
+        speechSynthesis.speak(utterance);
+    }
+
+    function stop() {
+        speechSynthesis.cancel();
+        setSpeakingState(false);
+    }
+
+    if (speakBtn) speakBtn.addEventListener("click", speak);
+    if (stopBtn) stopBtn.addEventListener("click", stop);
+
+    // If the user switches language while speaking, stop the current utterance
+    [langEn, langTa].forEach(function (radio) {
+        if (radio) {
+            radio.addEventListener("change", function () {
+                if (speechSynthesis.speaking) stop();
+            });
+        }
+    });
+
+    // Stop any speech if the user navigates away
+    window.addEventListener("beforeunload", function () {
+        speechSynthesis.cancel();
+    });
+});
 
 
 // ===============================

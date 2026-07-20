@@ -57,7 +57,10 @@
       <div class="topbar-title">{% block page_title %}Dashboard{% endblock %}</div>
       <div class="topbar-right">
         <span id="datetime"></span>
-        <button class="btn-lang">🌐 EN | த</button>
+        {% if session.user_name %}
+        <span class="user-chip">👤 {{ session.user_name }}</span>
+        <a href="{{ url_for('logout') }}" class="btn-lang logout-link">🚪 Logout</a>
+        {% endif %}
       </div>
     </header>
 

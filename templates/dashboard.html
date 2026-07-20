@@ -6,6 +6,9 @@
 
 <section class="hero">
   <div class="hero-text">
+    {% if session.user_name %}
+    <p class="welcome-line">Welcome, {{ session.user_name }} 👋</p>
+    {% endif %}
     <span class="eyebrow">Mango Orchard Intelligence</span>
     <h1>Temperature-Based Phenology Model<br>for Oriental Fruit Fly Detection</h1>
     <p class="hero-sub">
@@ -50,7 +53,29 @@
       <li><span class="step-index">07</span> Recommendation &amp; report</li>
     </ol>
   </div>
+</section>
 
+<section class="quick-actions">
+  <a href="{{ url_for('predict_page') }}" class="quick-card">
+    <span class="quick-icon">🔍</span>
+    <span class="quick-title">New Prediction</span>
+    <span class="quick-desc">Upload or capture a mango image</span>
+  </a>
+  <a href="{{ url_for('history_page') }}" class="quick-card">
+    <span class="quick-icon">📜</span>
+    <span class="quick-title">My History</span>
+    <span class="quick-desc">Review your past predictions</span>
+  </a>
+  <a href="{{ url_for('download') }}" class="quick-card">
+    <span class="quick-icon">📄</span>
+    <span class="quick-title">Reports</span>
+    <span class="quick-desc">Download your Excel report</span>
+  </a>
+  <a href="{{ url_for('about_page') }}" class="quick-card">
+    <span class="quick-icon">ℹ️</span>
+    <span class="quick-title">About</span>
+    <span class="quick-desc">Learn how the system works</span>
+  </a>
 </section>
 
 {% endblock %}

@@ -1,0 +1,36 @@
+{% extends "auth_base.html" %}
+{% block title %}Register | Phenology Model{% endblock %}
+
+{% block auth_content %}
+
+<span class="auth-eyebrow">Create account</span>
+<h2>Register as a farmer</h2>
+<p class="auth-sub">Registration / <span class="tamil">பதிவு செய்யவும்</span></p>
+
+{% if error %}
+<div class="alert-box small">{{ error }}</div>
+{% endif %}
+
+<form method="POST" action="{{ url_for('register') }}">
+  <div class="field">
+    <label>Full Name</label>
+    <input type="text" name="name" placeholder="e.g. Manjari" value="{{ form_name or '' }}" required>
+  </div>
+  <div class="field">
+    <label>Email</label>
+    <input type="email" name="email" placeholder="you@example.com" value="{{ form_email or '' }}" required>
+  </div>
+  <div class="field">
+    <label>Password</label>
+    <input type="password" name="password" placeholder="Minimum 6 characters" required minlength="6">
+  </div>
+  <div class="field">
+    <label>Confirm Password</label>
+    <input type="password" name="confirm_password" placeholder="Re-enter password" required minlength="6">
+  </div>
+  <button type="submit" class="btn-primary btn-block">Create Account →</button>
+</form>
+
+<p class="auth-switch">Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+
+{% endblock %}

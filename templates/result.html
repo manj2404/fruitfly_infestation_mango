@@ -69,9 +69,33 @@
     <h4>Confidence Graph <span class="tamil">நம்பகத்தன்மை வரைபடம்</span></h4>
     <canvas id="confidenceChart" data-value="{{ confidence }}" width="260" height="260"></canvas>
   </div>
-  <div class="panel text-center voice-panel">
+  <div class="panel text-center voice-panel" id="voicePanel"
+       data-prediction="{{ prediction }}"
+       data-prediction-tamil="{{ prediction_tamil }}"
+       data-confidence="{{ confidence }}"
+       data-stage="{{ stage }}"
+       data-stage-tamil="{{ stage_tamil }}"
+       data-risk="{{ risk }}"
+       data-risk-tamil="{{ risk_tamil }}"
+       data-recommendation="{{ recommendation }}"
+       data-recommendation-tamil="{{ recommendation_tamil }}">
     <h4>Voice Output <span class="tamil">குரல் வெளியீடு</span></h4>
-    <button class="btn-secondary" onclick="speakResult()">🔊 Speak Result / முடிவை கேளுங்கள்</button>
+
+    <div class="lang-toggle" role="radiogroup" aria-label="Voice language">
+      <label class="lang-option">
+        <input type="radio" name="voiceLang" value="en" id="langEn" checked>
+        <span>🌐 English</span>
+      </label>
+      <label class="lang-option">
+        <input type="radio" name="voiceLang" value="ta" id="langTa">
+        <span>🌐 தமிழ்</span>
+      </label>
+    </div>
+
+    <div class="voice-buttons">
+      <button class="btn-secondary" id="speakBtn">🔊 Speak Result</button>
+      <button class="btn-secondary" id="stopBtn" disabled>⏹ Stop</button>
+    </div>
   </div>
 </section>
 
