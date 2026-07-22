@@ -67,7 +67,9 @@
 <section class="grid-2">
   <div class="panel text-center">
     <h4>Confidence Graph <span class="tamil">நம்பகத்தன்மை வரைபடம்</span></h4>
-    <canvas id="confidenceChart" data-value="{{ confidence }}" width="260" height="260"></canvas>
+    <div class="chart-wrap">
+      <canvas id="confidenceChart" data-value="{{ confidence }}"></canvas>
+    </div>
   </div>
   <div class="panel text-center voice-panel" id="voicePanel"
        data-prediction="{{ prediction }}"
@@ -96,6 +98,8 @@
       <button class="btn-secondary" id="speakBtn">🔊 Speak Result</button>
       <button class="btn-secondary" id="stopBtn" disabled>⏹ Stop</button>
     </div>
+
+    <p class="voice-warning" id="voiceWarning" style="display:none;"></p>
   </div>
 </section>
 

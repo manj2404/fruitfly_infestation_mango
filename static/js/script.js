@@ -53,8 +53,69 @@ document.addEventListener("DOMContentLoaded", function () {
     const stopBtn = document.getElementById("stopBtn");
     const langEn = document.getElementById("langEn");
     const langTa = document.getElementById("langTa");
+    const voiceWarning = document.getElementById("voiceWarning");
 
     const data = panel.dataset;
+
+    // ---- Voice list loading & caching ----
+    // Chrome/Edge/Firefox load voices asynchronously. On first page load,
+    // speechSynthesis.getVoices() often returns an empty array until the
+    // "voiceschanged" event fires. We cache the list once it's ready so
+    // Speak works correctly even on the very first click.
+    let cachedVoices = [];
+
+    function loadVoices() {
+        return new Promise(function (resolve) {
+            let voices = speechSynthesis.getVoices();
+            if (voices.length > 0) {
+                cachedVoices = voices;
+                resolve(cachedVoices);
+                return;
+            }
+            speechSynthesis.onvoiceschanged = function () {
+                cachedVoices = speechSynthesis.getVoices();
+                resolve(cachedVoices);
+            };
+            // Safety net: some browsers never fire onvoiceschanged
+            setTimeout(function () {
+                if (cachedVoices.length === 0) {
+                    cachedVoices = speechSynthesis.getVoices();
+                }
+                resolve(cachedVoices);
+            }, 1000);
+        });
+    }
+
+    if ("speechSynthesis" in window) {
+        loadVoices(); // start loading immediately, before the user clicks Speak
+    }
+
+    // Finds the best matching installed voice for a language prefix ("ta" or "en").
+    // Tries an exact locale match first (e.g. "ta-IN"), then any voice whose
+    // lang code starts with the prefix (e.g. "ta-LK"), then gives up gracefully.
+    function findVoice(langPrefix) {
+        const list = cachedVoices.length ? cachedVoices : speechSynthesis.getVoices();
+        const exact = list.find(function (v) {
+            return v.lang.toLowerCase() === langPrefix + "-in";
+        });
+        if (exact) return exact;
+
+        const partial = list.find(function (v) {
+            return v.lang.toLowerCase().startsWith(langPrefix);
+        });
+        return partial || null;
+    }
+
+    function showVoiceWarning(message) {
+        if (!voiceWarning) return;
+        voiceWarning.textContent = message;
+        voiceWarning.style.display = "block";
+    }
+
+    function hideVoiceWarning() {
+        if (!voiceWarning) return;
+        voiceWarning.style.display = "none";
+    }
 
     function buildEnglishSentence() {
         const status = data.prediction === "HEALTHY" ? "healthy" : "infected";
@@ -91,13 +152,29 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         speechSynthesis.cancel(); // stop anything currently playing
+        hideVoiceWarning();
 
         const lang = getSelectedLang();
         const text = lang === "ta" ? buildTamilSentence() : buildEnglishSentence();
+        const voice = findVoice(lang);
+
+        if (lang === "ta" && !voice) {
+            // No Tamil voice installed on this device/browser. Speaking will likely
+            // be silent or garbled, so warn the user instead of failing silently.
+            showVoiceWarning(
+                "⚠️ No Tamil voice was found on this device. Install a Tamil voice " +
+                "(Windows: Settings → Time & Language → Language & Region → Add Tamil) " +
+                "and restart your browser, or switch to English."
+            );
+        }
 
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = lang === "ta" ? "ta-IN" : "en-IN";
         utterance.rate = 0.95;
+
+        if (voice) {
+            utterance.voice = voice;
+        }
 
         utterance.onstart = function () { setSpeakingState(true); };
         utterance.onend = function () { setSpeakingState(false); };
@@ -118,6 +195,7 @@ document.addEventListener("DOMContentLoaded", function () {
     [langEn, langTa].forEach(function (radio) {
         if (radio) {
             radio.addEventListener("change", function () {
+                hideVoiceWarning();
                 if (speechSynthesis.speaking) stop();
             });
         }
@@ -150,6 +228,8 @@ window.addEventListener("load", function () {
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
+                cutout: "68%",
                 plugins: {
                     legend: { position: 'bottom' }
                 }
