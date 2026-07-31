@@ -1,27 +1,42 @@
 {% extends "base.html" %}
 {% block title %}Dashboard | Phenology Model{% endblock %}
-{% block page_title %}Dashboard{% endblock %}
+{% block page_title %}<span class="lang-en">Dashboard</span><span class="lang-ta">முகப்பு</span>{% endblock %}
 
 {% block content %}
 
 <section class="hero">
   <div class="hero-text">
     {% if session.user_name %}
-    <p class="welcome-line">Welcome, {{ session.user_name }} 👋</p>
+    <p class="welcome-line">
+      <span class="lang-en">Welcome, {{ session.user_name }} 👋</span>
+      <span class="lang-ta">வணக்கம், {{ session.user_name }} 👋</span>
+    </p>
     {% endif %}
     <span class="eyebrow">Mango Orchard Intelligence</span>
-    <h1>Temperature-Based Phenology Model<br>for Oriental Fruit Fly Detection</h1>
-    <p class="hero-sub">
+
+    <div id="dashboardWeather" class="dashboard-weather" style="display:none;">
+      <span class="weather-icon">🌡</span> <span id="dashboardWeatherTemp"></span>
+      &nbsp;·&nbsp;
+      <span class="weather-icon">📍</span> <span id="dashboardWeatherLoc"></span>
+    </div>
+
+    <h1>
+      <span class="lang-en">Temperature-Based Phenology Model<br>for Oriental Fruit Fly Detection</span>
+      <span class="lang-ta">வெப்பநிலை அடிப்படையிலான பழ ஈ கண்டறிதல் மாதிரி</span>
+    </h1>
+    <p class="hero-sub lang-en">
       Using Growing Degree Days (GDD) to catch infected mangoes early and predict the fruit fly's life stage.
     </p>
-    <p class="hero-sub tamil">
+    <p class="hero-sub lang-ta">
       GDD மூலம் பாதிக்கப்பட்ட மாம்பழங்களை கண்டறிந்து, பழ ஈயின் வளர்ச்சி நிலையை முன்கூட்டியே கணிக்கிறது.
     </p>
-    <a href="{{ url_for('predict_page') }}" class="btn-primary">Start New Prediction →</a>
+    <a href="{{ url_for('predict_page') }}" class="btn-primary">
+      <span class="lang-en">Start New Prediction →</span><span class="lang-ta">புதிய கணிப்பு தொடங்கவும் →</span>
+    </a>
   </div>
 
   <div class="hero-stat-card">
-    <span class="stat-label">Predictions logged</span>
+    <span class="stat-label"><span class="lang-en">Predictions logged</span><span class="lang-ta">பதிவு செய்யப்பட்ட கணிப்புகள்</span></span>
     <span class="stat-number">{{ total_predictions }}</span>
   </div>
 </section>
@@ -29,23 +44,27 @@
 <section class="grid-2">
 
   <div class="panel">
-    <h3>Project Objective</h3>
-    <p>
+    <h3><span class="lang-en">Project Objective</span><span class="lang-ta">திட்ட நோக்கம்</span></h3>
+    <p class="lang-en">
       Oriental fruit fly (<em>Bactrocera dorsalis</em>) threatens mango crops. This system
       flags infected fruit and estimates the pest's life stage &mdash; egg, larva, pupa, or adult.
+    </p>
+    <p class="lang-ta">
+      ஓரியண்டல் பழ ஈ மாம்பழ பயிர்களுக்கு அச்சுறுத்தலாக உள்ளது. இந்த அமைப்பு பாதிக்கப்பட்ட பழங்களை
+      கண்டறிந்து, பூச்சியின் வளர்ச்சி நிலையை மதிப்பிடுகிறது &mdash; முட்டை, புழு, கூட்டு அல்லது முதிர்ந்தது.
     </p>
   </div>
 
   <div class="panel">
-    <h3>Detection Flow</h3>
+    <h3><span class="lang-en">Detection Flow</span><span class="lang-ta">கண்டறிதல் செயல்முறை</span></h3>
     <ol class="flow-steps">
-      <li><span class="step-index">01</span> Upload mango image</li>
-      <li><span class="step-index">02</span> Mango verification</li>
-      <li><span class="step-index">03</span> Fruit fly detection</li>
-      <li><span class="step-index">04</span> Temperature input</li>
-      <li><span class="step-index">05</span> GDD calculation</li>
-      <li><span class="step-index">06</span> Risk analysis</li>
-      <li><span class="step-index">07</span> Recommendation &amp; report</li>
+      <li><span class="step-index">01</span> <span class="lang-en">Upload mango image</span><span class="lang-ta">மாம்பழ படத்தை பதிவேற்றவும்</span></li>
+      <li><span class="step-index">02</span> <span class="lang-en">Mango verification</span><span class="lang-ta">மாம்பழ சரிபார்ப்பு</span></li>
+      <li><span class="step-index">03</span> <span class="lang-en">Fruit fly detection</span><span class="lang-ta">பழ ஈ கண்டறிதல்</span></li>
+      <li><span class="step-index">04</span> <span class="lang-en">Weather &amp; temperature</span><span class="lang-ta">வானிலை மற்றும் வெப்பநிலை</span></li>
+      <li><span class="step-index">05</span> <span class="lang-en">GDD calculation</span><span class="lang-ta">GDD கணக்கீடு</span></li>
+      <li><span class="step-index">06</span> <span class="lang-en">Risk analysis</span><span class="lang-ta">ஆபத்து பகுப்பாய்வு</span></li>
+      <li><span class="step-index">07</span> <span class="lang-en">Recommendation &amp; report</span><span class="lang-ta">பரிந்துரை &amp; அறிக்கை</span></li>
     </ol>
   </div>
 </section>
@@ -53,23 +72,23 @@
 <section class="quick-actions">
   <a href="{{ url_for('predict_page') }}" class="quick-card">
     <span class="quick-icon">🔍</span>
-    <span class="quick-title">New Prediction</span>
-    <span class="quick-desc">Upload or capture a mango image</span>
+    <span class="quick-title"><span class="lang-en">New Prediction</span><span class="lang-ta">புதிய கணிப்பு</span></span>
+    <span class="quick-desc"><span class="lang-en">Upload or capture a mango image</span><span class="lang-ta">மாம்பழ படத்தை பதிவேற்றவும்</span></span>
   </a>
   <a href="{{ url_for('history_page') }}" class="quick-card">
     <span class="quick-icon">📜</span>
-    <span class="quick-title">My History</span>
-    <span class="quick-desc">Review your past predictions</span>
+    <span class="quick-title"><span class="lang-en">My History</span><span class="lang-ta">என் வரலாறு</span></span>
+    <span class="quick-desc"><span class="lang-en">Review your past predictions</span><span class="lang-ta">முந்தைய கணிப்புகளைப் பார்க்கவும்</span></span>
   </a>
   <a href="{{ url_for('download') }}" class="quick-card">
     <span class="quick-icon">📄</span>
-    <span class="quick-title">Reports</span>
-    <span class="quick-desc">Download your Excel report</span>
+    <span class="quick-title"><span class="lang-en">Reports</span><span class="lang-ta">அறிக்கைகள்</span></span>
+    <span class="quick-desc"><span class="lang-en">Download your Excel report</span><span class="lang-ta">Excel அறிக்கையைப் பதிவிறக்கவும்</span></span>
   </a>
   <a href="{{ url_for('about_page') }}" class="quick-card">
     <span class="quick-icon">ℹ️</span>
-    <span class="quick-title">About</span>
-    <span class="quick-desc">Learn how the system works</span>
+    <span class="quick-title"><span class="lang-en">About</span><span class="lang-ta">எங்களை பற்றி</span></span>
+    <span class="quick-desc"><span class="lang-en">Learn how the system works</span><span class="lang-ta">அமைப்பு எவ்வாறு செயல்படுகிறது</span></span>
   </a>
 </section>
 

@@ -2,6 +2,117 @@
 // Phenology Model Dashboard Script
 // ===============================
 
+// ===============================
+// Site-wide Language Toggle
+// ===============================
+// The <html> element already gets the "lang-ta" class applied inline in
+// base.html's <head> (before paint) if localStorage has a saved Tamil
+// preference. This block wires up the dropdown UI and keeps everything
+// (including the voice output) in sync with that same preference.
+
+const SITE_LANGUAGE_KEY = "site_language";
+
+function getSiteLanguage() {
+    return document.documentElement.classList.contains("lang-ta") ? "ta" : "en";
+}
+
+function setSiteLanguage(lang) {
+    document.documentElement.classList.toggle("lang-ta", lang === "ta");
+    localStorage.setItem(SITE_LANGUAGE_KEY, lang);
+    updateLangDropdownLabel(lang);
+}
+
+function updateLangDropdownLabel(lang) {
+    const label = document.getElementById("langDropdownLabel");
+    if (label) {
+        label.textContent = lang === "ta" ? "தமிழ்" : "English";
+    }
+    document.querySelectorAll(".lang-dropdown-menu button").forEach(function (btn) {
+        btn.classList.toggle("is-selected", btn.dataset.lang === lang);
+    });
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    const dropdownBtn = document.getElementById("langDropdownBtn");
+    const dropdownMenu = document.getElementById("langDropdownMenu");
+
+    updateLangDropdownLabel(getSiteLanguage());
+
+    if (dropdownBtn && dropdownMenu) {
+        dropdownBtn.addEventListener("click", function (e) {
+            e.stopPropagation();
+            dropdownMenu.classList.toggle("open");
+        });
+
+        dropdownMenu.querySelectorAll("button[data-lang]").forEach(function (btn) {
+            btn.addEventListener("click", function () {
+                setSiteLanguage(btn.dataset.lang);
+                dropdownMenu.classList.remove("open");
+                // If voice is currently speaking, restart so it matches the new language
+                if ("speechSynthesis" in window && speechSynthesis.speaking) {
+                    speechSynthesis.cancel();
+                }
+                // Keep the predicted-value display (e.g. HEALTHY vs ஆரோக்கியமானது) in sync
+                const predictionText = document.getElementById("predictionText");
+                if (predictionText) {
+                    predictionText.textContent = btn.dataset.lang === "ta"
+                        ? predictionText.dataset.ta
+                        : predictionText.dataset.en;
+                }
+            });
+        });
+
+        document.addEventListener("click", function () {
+            dropdownMenu.classList.remove("open");
+        });
+    }
+});
+
+
+// ===============================
+// Dashboard Weather Widget
+// ===============================
+// Asks the browser for the farmer's location, then calls our own
+// /api/weather endpoint (which in turn calls weather.py) to show
+// today's temperature and place name at the top of the dashboard.
+
+document.addEventListener("DOMContentLoaded", function () {
+    const widget = document.getElementById("dashboardWeather");
+    if (!widget) return; // not on the dashboard
+
+    if (!("geolocation" in navigator)) return; // silently skip; not critical
+
+    navigator.geolocation.getCurrentPosition(
+        function (position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+
+            fetch("/api/weather?latitude=" + lat + "&longitude=" + lon)
+                .then(function (res) { return res.json(); })
+                .then(function (data) {
+                    if (data.error) return;
+                    const tempEl = document.getElementById("dashboardWeatherTemp");
+                    const locEl = document.getElementById("dashboardWeatherLoc");
+                    if (tempEl) tempEl.textContent = data.temp_max + "°C / " + data.temp_min + "°C";
+                    if (locEl) locEl.textContent = data.location_name;
+
+                    // Also populate the small topbar chip on every page
+                    const chip = document.getElementById("weatherInfo");
+                    if (chip) {
+                        chip.textContent = "🌡 " + data.temp_max + "°C / " + data.temp_min + "°C · 📍 " + data.location_name;
+                        chip.style.display = "inline-block";
+                    }
+
+                    widget.style.display = "inline-flex";
+                })
+                .catch(function () { /* silently ignore — non-critical widget */ });
+        },
+        function () { /* location denied — silently skip the widget */ },
+        { timeout: 8000 }
+    );
+});
+
+
 // Live Date & Time
 function updateDateTime() {
     const now = new Date();
@@ -51,8 +162,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const speakBtn = document.getElementById("speakBtn");
     const stopBtn = document.getElementById("stopBtn");
-    const langEn = document.getElementById("langEn");
-    const langTa = document.getElementById("langTa");
     const voiceWarning = document.getElementById("voiceWarning");
 
     const data = panel.dataset;
@@ -120,7 +229,9 @@ document.addEventListener("DOMContentLoaded", function () {
     function buildEnglishSentence() {
         const status = data.prediction === "HEALTHY" ? "healthy" : "infected";
 
-        return "The uploaded mango is " + status + ". " +
+        return "Today's maximum temperature is " + data.tempMax + " degrees Celsius. " +
+            "Minimum temperature is " + data.tempMin + " degrees Celsius. " +
+            "The uploaded mango is " + status + ". " +
             "Confidence is " + data.confidence + " percent. " +
             "Fruit fly stage is " + data.stage + ". " +
             "Risk level is " + data.risk.toLowerCase() + ". " +
@@ -128,7 +239,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function buildTamilSentence() {
-        return "பதிவேற்றப்பட்ட மாம்பழம் " + data.predictionTamil + ". " +
+        return "இன்றைய அதிகபட்ச வெப்பநிலை " + data.tempMax + " டிகிரி செல்சியஸ். " +
+            "குறைந்தபட்ச வெப்பநிலை " + data.tempMin + " டிகிரி செல்சியஸ். " +
+            "பதிவேற்றப்பட்ட மாம்பழம் " + data.predictionTamil + ". " +
             "நம்பகத்தன்மை " + data.confidence + " சதவீதம். " +
             "பழ ஈ நிலை " + data.stageTamil + ". " +
             "ஆபத்து " + data.riskTamil + ". " +
@@ -136,7 +249,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function getSelectedLang() {
-        return langTa && langTa.checked ? "ta" : "en";
+        return getSiteLanguage();
     }
 
     function setSpeakingState(isSpeaking) {
@@ -190,16 +303,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (speakBtn) speakBtn.addEventListener("click", speak);
     if (stopBtn) stopBtn.addEventListener("click", stop);
-
-    // If the user switches language while speaking, stop the current utterance
-    [langEn, langTa].forEach(function (radio) {
-        if (radio) {
-            radio.addEventListener("change", function () {
-                hideVoiceWarning();
-                if (speechSynthesis.speaking) stop();
-            });
-        }
-    });
 
     // Stop any speech if the user navigates away
     window.addEventListener("beforeunload", function () {

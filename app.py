@@ -10,6 +10,7 @@ import numpy as np
 from tensorflow.keras.utils import load_img, img_to_array
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
+import weather
 
 app = Flask(__name__)
 
@@ -194,6 +195,36 @@ def dashboard():
 
 
 # ==========================
+# Weather API (used by the dashboard header widget)
+# ==========================
+# The dashboard route above cannot know the farmer's GPS location on its
+# own (Flask only knows what the browser sends). The browser calls this
+# endpoint via JavaScript with navigator.geolocation coordinates, and we
+# fetch live weather for it — same weather.py module used by /predict.
+
+@app.route("/api/weather")
+@login_required
+def api_weather():
+
+    latitude = request.args.get("latitude", "")
+    longitude = request.args.get("longitude", "")
+
+    if not latitude or not longitude:
+        return {"error": "Missing latitude/longitude."}, 400
+
+    try:
+        weather_data = weather.get_temperature(latitude, longitude)
+    except weather.WeatherError:
+        return {"error": "Could not fetch weather data."}, 502
+
+    return {
+        "temp_max": weather_data["temp_max"],
+        "temp_min": weather_data["temp_min"],
+        "location_name": weather_data["location_name"],
+    }
+
+
+# ==========================
 # New Prediction (Form Page)
 # ==========================
 
@@ -312,18 +343,51 @@ def predict():
         confidence = (1 - probability) * 100
 
     # -------------------------
-    # Temperature
+    # Temperature (via GPS + Weather API, with manual fallback)
     # -------------------------
 
-    try:
-        temp_max = float(request.form["temp_max"])
-        temp_min = float(request.form["temp_min"])
-    except (KeyError, ValueError):
+    latitude = request.form.get("latitude", "").strip()
+    longitude = request.form.get("longitude", "").strip()
+    manual_temp_max = request.form.get("temp_max", "").strip()
+    manual_temp_min = request.form.get("temp_min", "").strip()
+
+    location_name = None
+
+    if latitude and longitude:
+        # Preferred path: farmer allowed location access, fetch live weather
+        try:
+            weather_data = weather.get_temperature(latitude, longitude)
+            temp_max = weather_data["temp_max"]
+            temp_min = weather_data["temp_min"]
+            location_name = weather_data["location_name"]
+        except weather.WeatherError:
+            return render_template(
+                "predict.html",
+                active="predict",
+                error="❌ Could not fetch weather data for your location. Please enter temperatures manually below.",
+                error_tamil="❌ உங்கள் இருப்பிடத்திற்கான வானிலை தகவலைப் பெற முடியவில்லை. கீழே வெப்பநிலையை நேரடியாக உள்ளிடவும்.",
+                show_manual_fallback=True
+            )
+    elif manual_temp_max and manual_temp_min:
+        # Fallback path: location denied/unavailable, farmer typed temperatures
+        try:
+            temp_max = float(manual_temp_max)
+            temp_min = float(manual_temp_min)
+        except ValueError:
+            return render_template(
+                "predict.html",
+                active="predict",
+                error="❌ Please enter valid maximum and minimum temperature values.",
+                error_tamil="❌ சரியான அதிகபட்ச மற்றும் குறைந்தபட்ச வெப்பநிலை மதிப்புகளை உள்ளிடவும்.",
+                show_manual_fallback=True
+            )
+    else:
         return render_template(
             "predict.html",
             active="predict",
-            error="❌ Please enter valid maximum and minimum temperature values.",
-            error_tamil="❌ சரியான அதிகபட்ச மற்றும் குறைந்தபட்ச வெப்பநிலை மதிப்புகளை உள்ளிடவும்."
+            error="❌ Please allow location access, or enter temperatures manually.",
+            error_tamil="❌ இருப்பிட அனுமதி வழங்கவும் அல்லது வெப்பநிலையை நேரடியாக உள்ளிடவும்.",
+            show_manual_fallback=True
         )
 
     BASE_TEMP = 10
@@ -449,6 +513,9 @@ def predict():
         "Confidence (%)": [round(confidence, 2)],
         "Risk": [risk],
         "Stage": [stage],
+        "Location": [location_name or "Manual entry"],
+        "Max Temp (°C)": [round(temp_max, 1)],
+        "Min Temp (°C)": [round(temp_min, 1)],
         "GDD": [round(gdd, 2)]
     }
 
@@ -495,6 +562,10 @@ def predict():
         stage_image=stage_image,
 
         gdd=round(gdd, 2),
+
+        temp_max=round(temp_max, 1),
+        temp_min=round(temp_min, 1),
+        location_name=location_name or "Entered manually",
 
         recommendation=recommendation,
         recommendation_tamil=recommendation_tamil,
@@ -592,10 +663,6 @@ def download():
 # Run Flask App
 # ==========================
 
-import os
-
 if __name__ == "__main__":
-    app.run(
-        host="0.0.0.0",
-        port=int(os.environ.get("PORT", 7860))
-    )
+
+    app.run(debug=True)

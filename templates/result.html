@@ -1,18 +1,18 @@
 {% extends "base.html" %}
 {% block title %}Result | Phenology Model{% endblock %}
-{% block page_title %}Prediction Result{% endblock %}
+{% block page_title %}<span class="lang-en">Prediction Result</span><span class="lang-ta">கணிப்பு முடிவு</span>{% endblock %}
 
 {% block content %}
 
 <section class="result-cards">
 
   <div class="panel media-panel">
-    <h4>📷 Uploaded Image <span class="tamil">பதிவேற்றப்பட்ட படம்</span></h4>
+    <h4><span class="lang-en">📷 Uploaded Image</span><span class="lang-ta">📷 பதிவேற்றப்பட்ட படம்</span></h4>
     <img src="{{ url_for('static', filename='uploads/' + uploaded_image) }}" class="media-img">
   </div>
 
   <div class="panel media-panel">
-    <h4>🪰 Fruit Fly Stage <span class="tamil">பழ ஈ வளர்ச்சி நிலை</span></h4>
+    <h4><span class="lang-en">🪰 Fruit Fly Stage</span><span class="lang-ta">🪰 பழ ஈ வளர்ச்சி நிலை</span></h4>
     <img src="{{ url_for('static', filename=stage_image) }}" class="media-img">
   </div>
 
@@ -20,53 +20,81 @@
 
 <!-- Life-cycle progression: a real ordered sequence, so numbering earns its place -->
 <section class="panel">
-  <h4>Life Stage Progression <span class="tamil">வாழ்க்கை சுழற்சி நிலை</span></h4>
+  <h4><span class="lang-en">Life Stage Progression</span><span class="lang-ta">வாழ்க்கை சுழற்சி நிலை</span></h4>
   <div class="stage-track">
     <div class="stage-node {{ 'is-active' if stage == 'Egg Stage' else '' }}">
-      <span class="node-dot"></span><span>Egg</span>
+      <span class="node-dot"></span><span><span class="lang-en">Egg</span><span class="lang-ta">முட்டை</span></span>
     </div>
     <div class="stage-node {{ 'is-active' if stage == 'Larva Stage' else '' }}">
-      <span class="node-dot"></span><span>Larva</span>
+      <span class="node-dot"></span><span><span class="lang-en">Larva</span><span class="lang-ta">புழு</span></span>
     </div>
     <div class="stage-node {{ 'is-active' if stage == 'Pupa Stage' else '' }}">
-      <span class="node-dot"></span><span>Pupa</span>
+      <span class="node-dot"></span><span><span class="lang-en">Pupa</span><span class="lang-ta">கூட்டு</span></span>
     </div>
     <div class="stage-node {{ 'is-active' if stage == 'Adult Stage' else '' }}">
-      <span class="node-dot"></span><span>Adult</span>
+      <span class="node-dot"></span><span><span class="lang-en">Adult</span><span class="lang-ta">முதிர்ந்தது</span></span>
+    </div>
+  </div>
+</section>
+
+<section class="panel weather-panel">
+  <h4><span class="lang-en">📍 Weather Used for This Prediction</span><span class="lang-ta">📍 இந்த கணிப்புக்கு பயன்படுத்தப்பட்ட வானிலை</span></h4>
+  <div class="weather-row">
+    <div class="weather-item">
+      <span class="weather-icon">📍</span>
+      <div>
+        <span class="weather-label"><span class="lang-en">Location</span><span class="lang-ta">இருப்பிடம்</span></span>
+        <span class="weather-value">{{ location_name }}</span>
+      </div>
+    </div>
+    <div class="weather-item">
+      <span class="weather-icon">🌡</span>
+      <div>
+        <span class="weather-label"><span class="lang-en">Maximum</span><span class="lang-ta">அதிகபட்சம்</span></span>
+        <span class="weather-value">{{ temp_max }}°C</span>
+      </div>
+    </div>
+    <div class="weather-item">
+      <span class="weather-icon">🌙</span>
+      <div>
+        <span class="weather-label"><span class="lang-en">Minimum</span><span class="lang-ta">குறைந்தபட்சம்</span></span>
+        <span class="weather-value">{{ temp_min }}°C</span>
+      </div>
     </div>
   </div>
 </section>
 
 <section class="grid-4">
   <div class="stat-card">
-    <span class="stat-card-label">Prediction / கணிப்பு</span>
-    <span class="stat-card-value" id="predictionText">{{ prediction }}</span>
+    <span class="stat-card-label"><span class="lang-en">Prediction</span><span class="lang-ta">கணிப்பு</span></span>
+    <span class="stat-card-value" id="predictionText" data-en="{{ prediction }}" data-ta="{{ prediction_tamil }}">{{ prediction }}</span>
   </div>
   <div class="stat-card">
-    <span class="stat-card-label">Confidence / நம்பகத்தன்மை</span>
+    <span class="stat-card-label"><span class="lang-en">Confidence</span><span class="lang-ta">நம்பகத்தன்மை</span></span>
     <span class="stat-card-value">{{ confidence }}%</span>
     <div class="mini-bar"><div class="mini-bar-fill" style="width:{{ confidence }}%;"></div></div>
   </div>
   <div class="stat-card">
-    <span class="stat-card-label">Risk Level / ஆபத்து நிலை</span>
-    <span class="stat-card-value risk-{{ risk|replace(' ', '')|lower }}">{{ risk }}</span>
+    <span class="stat-card-label"><span class="lang-en">Risk Level</span><span class="lang-ta">ஆபத்து நிலை</span></span>
+    <span class="stat-card-value risk-{{ risk|replace(' ', '')|lower }}">
+      <span class="lang-en">{{ risk }}</span><span class="lang-ta">{{ risk_tamil }}</span>
+    </span>
   </div>
   <div class="stat-card">
-    <span class="stat-card-label">GDD Value / GDD மதிப்பு</span>
+    <span class="stat-card-label"><span class="lang-en">GDD Value</span><span class="lang-ta">GDD மதிப்பு</span></span>
     <span class="stat-card-value mono">{{ gdd }}</span>
   </div>
 </section>
 
 <section class="panel recommendation-panel">
-  <h4>💡 Recommendation / பரிந்துரை</h4>
-  <p>{{ recommendation }}</p>
-  <hr>
-  <p class="tamil">{{ recommendation_tamil }}</p>
+  <h4><span class="lang-en">💡 Recommendation</span><span class="lang-ta">💡 பரிந்துரை</span></h4>
+  <p class="lang-en">{{ recommendation }}</p>
+  <p class="lang-ta">{{ recommendation_tamil }}</p>
 </section>
 
 <section class="grid-2">
   <div class="panel text-center">
-    <h4>Confidence Graph <span class="tamil">நம்பகத்தன்மை வரைபடம்</span></h4>
+    <h4><span class="lang-en">Confidence Graph</span><span class="lang-ta">நம்பகத்தன்மை வரைபடம்</span></h4>
     <div class="chart-wrap">
       <canvas id="confidenceChart" data-value="{{ confidence }}"></canvas>
     </div>
@@ -80,23 +108,22 @@
        data-risk="{{ risk }}"
        data-risk-tamil="{{ risk_tamil }}"
        data-recommendation="{{ recommendation }}"
-       data-recommendation-tamil="{{ recommendation_tamil }}">
-    <h4>Voice Output <span class="tamil">குரல் வெளியீடு</span></h4>
-
-    <div class="lang-toggle" role="radiogroup" aria-label="Voice language">
-      <label class="lang-option">
-        <input type="radio" name="voiceLang" value="en" id="langEn" checked>
-        <span>🌐 English</span>
-      </label>
-      <label class="lang-option">
-        <input type="radio" name="voiceLang" value="ta" id="langTa">
-        <span>🌐 தமிழ்</span>
-      </label>
-    </div>
+       data-recommendation-tamil="{{ recommendation_tamil }}"
+       data-temp-max="{{ temp_max }}"
+       data-temp-min="{{ temp_min }}">
+    <h4><span class="lang-en">Voice Output</span><span class="lang-ta">குரல் வெளியீடு</span></h4>
+    <p class="voice-hint">
+      <span class="lang-en">Speaks in your selected site language (🌐 above)</span>
+      <span class="lang-ta">தேர்ந்தெடுக்கப்பட்ட மொழியில் பேசும்</span>
+    </p>
 
     <div class="voice-buttons">
-      <button class="btn-secondary" id="speakBtn">🔊 Speak Result</button>
-      <button class="btn-secondary" id="stopBtn" disabled>⏹ Stop</button>
+      <button class="btn-secondary" id="speakBtn">
+        <span class="lang-en">🔊 Speak Result</span><span class="lang-ta">🔊 முடிவைக் கேளுங்கள்</span>
+      </button>
+      <button class="btn-secondary" id="stopBtn" disabled>
+        <span class="lang-en">⏹ Stop</span><span class="lang-ta">⏹ நிறுத்து</span>
+      </button>
     </div>
 
     <p class="voice-warning" id="voiceWarning" style="display:none;"></p>
@@ -104,12 +131,16 @@
 </section>
 
 <div class="text-center action-row">
-  <a href="{{ url_for('download') }}" class="btn-primary">📄 Download Report / அறிக்கையை பதிவிறக்கவும்</a>
-  <a href="{{ url_for('predict_page') }}" class="btn-secondary">🔍 New Prediction</a>
+  <a href="{{ url_for('download') }}" class="btn-primary">
+    <span class="lang-en">📄 Download Report</span><span class="lang-ta">📄 அறிக்கையை பதிவிறக்கவும்</span>
+  </a>
+  <a href="{{ url_for('predict_page') }}" class="btn-secondary">
+    <span class="lang-en">🔍 New Prediction</span><span class="lang-ta">🔍 புதிய கணிப்பு</span>
+  </a>
 </div>
 
 <section class="panel">
-  <h4>📋 Prediction Summary / கணிப்பு சுருக்கம்</h4>
+  <h4><span class="lang-en">📋 Prediction Summary</span><span class="lang-ta">📋 கணிப்பு சுருக்கம்</span></h4>
   <table class="summary-table">
     <tr><th>English</th><th>தமிழ்</th></tr>
     <tr><td>{{ prediction }}</td><td>{{ prediction_tamil }}</td></tr>

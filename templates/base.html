@@ -10,6 +10,16 @@
 
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 {% block head %}{% endblock %}
+<script>
+  // Apply saved language BEFORE paint, so the page never flashes English
+  // then switches to Tamil after load.
+  (function () {
+    var lang = localStorage.getItem("site_language") || "en";
+    if (lang === "ta") {
+      document.documentElement.classList.add("lang-ta");
+    }
+  })();
+</script>
 </head>
 <body>
 
@@ -27,19 +37,24 @@
 
     <nav class="sidebar-nav">
       <a href="{{ url_for('dashboard') }}" class="{{ 'active' if active=='dashboard' else '' }}">
-        <span class="nav-icon">🏠</span> Dashboard
+        <span class="nav-icon">🏠</span>
+        <span class="lang-en">Dashboard</span><span class="lang-ta">முகப்பு</span>
       </a>
       <a href="{{ url_for('predict_page') }}" class="{{ 'active' if active=='predict' else '' }}">
-        <span class="nav-icon">🔍</span> New Prediction
+        <span class="nav-icon">🔍</span>
+        <span class="lang-en">New Prediction</span><span class="lang-ta">கணிப்பு</span>
       </a>
       <a href="{{ url_for('history_page') }}" class="{{ 'active' if active=='history' else '' }}">
-        <span class="nav-icon">📜</span> Prediction History
+        <span class="nav-icon">📜</span>
+        <span class="lang-en">Prediction History</span><span class="lang-ta">வரலாறு</span>
       </a>
       <a href="{{ url_for('download') }}" class="{{ 'active' if active=='reports' else '' }}">
-        <span class="nav-icon">📄</span> Reports
+        <span class="nav-icon">📄</span>
+        <span class="lang-en">Reports</span><span class="lang-ta">அறிக்கைகள்</span>
       </a>
       <a href="{{ url_for('about_page') }}" class="{{ 'active' if active=='about' else '' }}">
-        <span class="nav-icon">ℹ️</span> About
+        <span class="nav-icon">ℹ️</span>
+        <span class="lang-en">About</span><span class="lang-ta">எங்களை பற்றி</span>
       </a>
     </nav>
   </aside>
@@ -52,9 +67,23 @@
       <div class="topbar-title">{% block page_title %}Dashboard{% endblock %}</div>
       <div class="topbar-right">
         <span id="datetime"></span>
+        <span id="weatherInfo" class="weather-chip" style="display:none;"></span>
+
+        <div class="lang-dropdown" id="langDropdown">
+          <button type="button" class="btn-lang" id="langDropdownBtn">
+            🌐 <span id="langDropdownLabel">English</span> ▾
+          </button>
+          <div class="lang-dropdown-menu" id="langDropdownMenu">
+            <button type="button" data-lang="en">🇬🇧 English</button>
+            <button type="button" data-lang="ta">🇮🇳 தமிழ்</button>
+          </div>
+        </div>
+
         {% if session.user_name %}
         <span class="user-chip">👤 {{ session.user_name }}</span>
-        <a href="{{ url_for('logout') }}" class="btn-lang logout-link">🚪 Logout</a>
+        <a href="{{ url_for('logout') }}" class="btn-lang logout-link">
+          🚪 <span class="lang-en">Logout</span><span class="lang-ta">வெளியேறு</span>
+        </a>
         {% endif %}
       </div>
     </header>
@@ -64,7 +93,8 @@
     </main>
 
     <footer class="footer">
-      <span>Phenology Model · Mango Fruit Fly Detection</span>
+      <span class="lang-en">Phenology Model · Mango Fruit Fly Detection</span>
+      <span class="lang-ta">பழ ஈ கண்டறிதல் மாதிரி</span>
     </footer>
 
   </div>

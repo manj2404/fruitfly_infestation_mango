@@ -1,32 +1,34 @@
 {% extends "base.html" %}
 {% block title %}New Prediction | Phenology Model{% endblock %}
-{% block page_title %}New Prediction{% endblock %}
+{% block page_title %}<span class="lang-en">New Prediction</span><span class="lang-ta">கணிப்பு</span>{% endblock %}
 
 {% block content %}
 
 {% if error %}
 <div class="alert-box">
-  <h4>❌ {{ error }}</h4>
-  <p class="tamil">{{ error_tamil }}</p>
+  <h4><span class="lang-en">{{ error }}</span><span class="lang-ta">{{ error_tamil }}</span></h4>
 </div>
 {% endif %}
 
 <div class="panel form-panel">
-  <h3>📷 Image &amp; Temperature Input</h3>
-  <p class="muted">படம் மற்றும் வெப்பநிலை உள்ளீடு</p>
+  <h3><span class="lang-en">📷 Image &amp; Temperature Input</span><span class="lang-ta">📷 படம் மற்றும் வெப்பநிலை உள்ளீடு</span></h3>
 
   <form action="{{ url_for('predict') }}" method="POST" enctype="multipart/form-data" id="predictForm">
 
     <div class="field">
-      <label>📷 Mango Image <span class="tamil">மாம்பழ படத்தை பதிவேற்றவும்</span></label>
+      <label><span class="lang-en">📷 Mango Image</span><span class="lang-ta">📷 மாம்பழ படத்தை பதிவேற்றவும்</span></label>
 
       <input type="file" id="mainImageInput" name="image" accept=".png,.jpg,.jpeg" style="display:none">
       <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none">
       <input type="file" id="galleryInput" accept=".png,.jpg,.jpeg" style="display:none">
 
       <div class="upload-choice">
-        <button type="button" class="btn-secondary" id="captureBtn">📷 Capture Photo</button>
-        <button type="button" class="btn-secondary" id="galleryBtn">🖼️ Choose from Gallery</button>
+        <button type="button" class="btn-secondary" id="captureBtn">
+          <span class="lang-en">📷 Capture Photo</span><span class="lang-ta">📷 புகைப்படம் எடுக்கவும்</span>
+        </button>
+        <button type="button" class="btn-secondary" id="galleryBtn">
+          <span class="lang-en">🖼️ Choose from Gallery</span><span class="lang-ta">🖼️ கேலரியிலிருந்து தேர்வு</span>
+        </button>
       </div>
 
       <div id="imagePreviewWrap" class="image-preview-wrap">
@@ -35,18 +37,37 @@
       </div>
     </div>
 
-    <div class="field-row">
-      <div class="field">
-        <label>🌡 Maximum Temperature (°C) <span class="tamil">அதிகபட்ச வெப்பநிலை</span></label>
-        <input type="number" step="any" name="temp_max" placeholder="e.g. 34" required>
-      </div>
-      <div class="field">
-        <label>🌡 Minimum Temperature (°C) <span class="tamil">குறைந்தபட்ச வெப்பநிலை</span></label>
-        <input type="number" step="any" name="temp_min" placeholder="e.g. 22" required>
+    <div class="field">
+      <label><span class="lang-en">📍 Weather &amp; Location</span><span class="lang-ta">📍 வானிலை மற்றும் இருப்பிடம்</span></label>
+
+      <input type="hidden" id="latitudeInput" name="latitude" value="">
+      <input type="hidden" id="longitudeInput" name="longitude" value="">
+
+      <button type="button" class="btn-secondary" id="locationBtn">
+        <span class="lang-en">📍 Allow Location</span><span class="lang-ta">📍 இருப்பிடத்தை அனுமதிக்கவும்</span>
+      </button>
+
+      <div id="locationStatus" class="location-status"></div>
+
+      <button type="button" class="link-btn" id="manualToggleBtn">
+        <span class="lang-en">Enter temperature manually instead</span><span class="lang-ta">வெப்பநிலையை நேரடியாக உள்ளிடவும்</span>
+      </button>
+
+      <div id="manualTempFields" class="field-row manual-temp-fields{{ ' active' if show_manual_fallback else '' }}">
+        <div class="field">
+          <label><span class="lang-en">🌡 Maximum Temperature (°C)</span><span class="lang-ta">🌡 அதிகபட்ச வெப்பநிலை</span></label>
+          <input type="number" step="any" name="temp_max" id="tempMaxInput" placeholder="e.g. 34">
+        </div>
+        <div class="field">
+          <label><span class="lang-en">🌡 Minimum Temperature (°C)</span><span class="lang-ta">🌡 குறைந்தபட்ச வெப்பநிலை</span></label>
+          <input type="number" step="any" name="temp_min" id="tempMinInput" placeholder="e.g. 22">
+        </div>
       </div>
     </div>
 
-    <button type="submit" class="btn-primary btn-block">🔍 Predict / கணிக்கவும்</button>
+    <button type="submit" class="btn-primary btn-block">
+      <span class="lang-en">🔍 Predict</span><span class="lang-ta">🔍 கணிக்கவும்</span>
+    </button>
 
   </form>
 </div>
@@ -65,6 +86,15 @@ document.addEventListener("DOMContentLoaded", function () {
   const previewImg = document.getElementById("imagePreview");
   const previewName = document.getElementById("imageFileName");
   const form = document.getElementById("predictForm");
+
+  const locationBtn = document.getElementById("locationBtn");
+  const locationStatus = document.getElementById("locationStatus");
+  const latitudeInput = document.getElementById("latitudeInput");
+  const longitudeInput = document.getElementById("longitudeInput");
+  const manualToggleBtn = document.getElementById("manualToggleBtn");
+  const manualTempFields = document.getElementById("manualTempFields");
+  const tempMaxInput = document.getElementById("tempMaxInput");
+  const tempMinInput = document.getElementById("tempMinInput");
 
   function useFile(sourceInput) {
     if (sourceInput.files && sourceInput.files.length > 0) {
@@ -85,11 +115,65 @@ document.addEventListener("DOMContentLoaded", function () {
   if (cameraInput) cameraInput.addEventListener("change", () => useFile(cameraInput));
   if (galleryInput) galleryInput.addEventListener("change", () => useFile(galleryInput));
 
+  // ---- GPS location capture ----
+  function setLocationStatus(text, isError) {
+    locationStatus.textContent = text;
+    locationStatus.classList.toggle("is-error", !!isError);
+    locationStatus.classList.toggle("is-success", !isError);
+  }
+
+  if (locationBtn) {
+    locationBtn.addEventListener("click", function () {
+      if (!("geolocation" in navigator)) {
+        setLocationStatus("Geolocation is not supported on this browser. Please enter temperature manually.", true);
+        showManualFields();
+        return;
+      }
+
+      setLocationStatus("📡 Detecting your location...", false);
+      locationBtn.disabled = true;
+
+      navigator.geolocation.getCurrentPosition(
+        function (position) {
+          latitudeInput.value = position.coords.latitude;
+          longitudeInput.value = position.coords.longitude;
+          setLocationStatus("✅ Location captured. Weather will be fetched automatically at prediction time.", false);
+          locationBtn.disabled = false;
+        },
+        function () {
+          setLocationStatus("❌ Location access denied or unavailable. Please enter temperature manually.", true);
+          locationBtn.disabled = false;
+          showManualFields();
+        },
+        { timeout: 10000 }
+      );
+    });
+  }
+
+  function showManualFields() {
+    manualTempFields.classList.add("active");
+  }
+
+  if (manualToggleBtn) {
+    manualToggleBtn.addEventListener("click", function () {
+      manualTempFields.classList.toggle("active");
+    });
+  }
+
   if (form) {
     form.addEventListener("submit", function (e) {
       if (!mainInput.files || mainInput.files.length === 0) {
         e.preventDefault();
         alert("Please capture or choose a mango image before predicting.\nமாம்பழ படத்தை தேர்ந்தெடுக்கவும்.");
+        return;
+      }
+
+      const hasLocation = latitudeInput.value && longitudeInput.value;
+      const hasManualTemp = tempMaxInput.value && tempMinInput.value;
+
+      if (!hasLocation && !hasManualTemp) {
+        e.preventDefault();
+        alert("Please get your location or enter temperature manually.\nஇருப்பிடத்தைப் பெறவும் அல்லது வெப்பநிலையை நேரடியாக உள்ளிடவும்.");
       }
     });
   }

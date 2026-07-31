@@ -1,39 +1,50 @@
 {% extends "base.html" %}
 {% block title %}About | Phenology Model{% endblock %}
-{% block page_title %}About This Project{% endblock %}
+{% block page_title %}<span class="lang-en">About This Project</span><span class="lang-ta">திட்டத்தைப் பற்றி</span>{% endblock %}
 
 {% block content %}
 
 <div class="panel">
-  <h3>Project Title</h3>
-  <p>Temperature-Based Phenology Model for Oriental Fruit Fly Detection in Mango</p>
+  <h3><span class="lang-en">Project Title</span><span class="lang-ta">திட்டத் தலைப்பு</span></h3>
+  <p class="lang-en">Temperature-Based Phenology Model for Oriental Fruit Fly Detection in Mango</p>
+  <p class="lang-ta">மாம்பழத்தில் ஓரியண்டல் பழ ஈ கண்டறிதலுக்கான வெப்பநிலை அடிப்படையிலான மாதிரி</p>
 </div>
 
 <div class="grid-2">
   <div class="panel">
-    <h3>Objective</h3>
-    <p>Help mango farmers spot fruit fly infestation early and know the pest's likely life stage, so control measures land at the right time.</p>
+    <h3><span class="lang-en">Objective</span><span class="lang-ta">நோக்கம்</span></h3>
+    <p class="lang-en">Help mango farmers spot fruit fly infestation early and know the pest's likely life stage, so control measures land at the right time.</p>
+    <p class="lang-ta">மாம்பழ விவசாயிகள் பழ ஈ தாக்குதலை முன்கூட்டியே கண்டறிந்து, பூச்சியின் வளர்ச்சி நிலையை அறிந்து, சரியான நேரத்தில் கட்டுப்பாட்டு நடவடிக்கை எடுக்க உதவுகிறது.</p>
   </div>
 
   <div class="panel">
-    <h3>Methodology</h3>
-    <p>A model checks the image is a mango, then flags it healthy or infected. Daily max/min temperatures feed a Growing Degree Days (GDD) calculation that estimates the pest's stage and drives the risk level shown.</p>
+    <h3><span class="lang-en">Methodology</span><span class="lang-ta">முறை</span></h3>
+    <p class="lang-en">A model checks the image is a mango, then flags it healthy or infected. The farmer's device location is used to automatically fetch today's max/min temperature, which feeds a Growing Degree Days (GDD) calculation that estimates the pest's stage and drives the risk level shown.</p>
+    <p class="lang-ta">படம் மாம்பழமா என சரிபார்க்கப்பட்டு, ஆரோக்கியமானதா அல்லது பாதிக்கப்பட்டதா எனக் கண்டறியப்படுகிறது. விவசாயியின் இருப்பிடத்தைப் பயன்படுத்தி இன்றைய வெப்பநிலை தானாகப் பெறப்பட்டு, GDD கணக்கீடு மூலம் பூச்சியின் நிலை மதிப்பிடப்படுகிறது.</p>
   </div>
 </div>
 
 <div class="panel">
-  <h3>GDD Formula</h3>
+  <h3><span class="lang-en">Weather Data Source</span><span class="lang-ta">வானிலை தரவு மூலம்</span></h3>
+  <p class="lang-en">Temperature is fetched automatically from the farmer's GPS location using the <strong>Open-Meteo</strong> weather API (no manual entry needed). If location access is unavailable, temperatures can be entered manually as a fallback.</p>
+  <p class="lang-ta">விவசாயியின் GPS இருப்பிடத்தைப் பயன்படுத்தி <strong>Open-Meteo</strong> வானிலை API மூலம் வெப்பநிலை தானாகப் பெறப்படுகிறது. இருப்பிடம் கிடைக்கவில்லை என்றால், வெப்பநிலையை நேரடியாக உள்ளிடலாம்.</p>
+</div>
+
+<div class="panel">
+  <h3><span class="lang-en">GDD Formula</span><span class="lang-ta">GDD சூத்திரம்</span></h3>
   <p class="mono formula">GDD = ((T_max + T_min) / 2) − Base Temperature (10°C)</p>
 </div>
 
 <div class="grid-2">
   <div class="panel">
-    <h3>Student Details</h3>
-    <p class="muted">Add your name, register number, and degree programme here.</p>
+    <h3><span class="lang-en">Student Details</span><span class="lang-ta">மாணவர் விவரங்கள்</span></h3>
+    <p class="muted lang-en">Add your name, register number, and degree programme here.</p>
+    <p class="muted lang-ta">உங்கள் பெயர், பதிவு எண் மற்றும் பட்டப்படிப்பை இங்கே சேர்க்கவும்.</p>
   </div>
   <div class="panel">
-    <h3>Guide Details</h3>
-    <p class="muted">Add your project guide's name and designation here.</p>
+    <h3><span class="lang-en">Guide Details</span><span class="lang-ta">வழிகாட்டி விவரங்கள்</span></h3>
+    <p class="muted lang-en">Add your project guide's name and designation here.</p>
+    <p class="muted lang-ta">உங்கள் திட்ட வழிகாட்டியின் பெயர் மற்றும் பதவியை இங்கே சேர்க்கவும்.</p>
   </div>
 </div>
 
