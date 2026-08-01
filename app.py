@@ -1,10 +1,4 @@
 import os
-
-# Must be set BEFORE tensorflow is imported, so it never
-# searches for CUDA/GPU drivers and wastes memory doing so.
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
-
 import sqlite3
 from functools import wraps
 import pandas as pd
@@ -170,22 +164,8 @@ def logout():
 # Load Models
 # ==========================
 
-fruitfly_model = None
-mango_model = None
-
-
-def get_fruitfly_model():
-    global fruitfly_model
-    if fruitfly_model is None:
-        fruitfly_model = tf.keras.models.load_model("model.keras")
-    return fruitfly_model
-
-
-def get_mango_model():
-    global mango_model
-    if mango_model is None:
-        mango_model = tf.keras.models.load_model("mango_detector.keras")
-    return mango_model
+fruitfly_model = tf.keras.models.load_model("model.keras")
+mango_model = tf.keras.models.load_model("mango_detector.keras")
 
 # ==========================
 # Dashboard (Home)
@@ -314,7 +294,7 @@ def predict():
     img_array = img_array / 255.0
     img_array = np.expand_dims(img_array, axis=0)
 
-    mango_prediction = get_mango_model().predict(img_array)
+    mango_prediction = mango_model.predict(img_array)
 
     mango_probability = float(mango_prediction[0][0])
 
@@ -341,7 +321,7 @@ def predict():
     # Fruit Fly Prediction
     # ----------------------
 
-    prediction = get_fruitfly_model().predict(img_array)
+    prediction = fruitfly_model.predict(img_array)
 
     probability = float(prediction[0][0])
     # -------------------------
@@ -685,4 +665,5 @@ def download():
 
 if __name__ == "__main__":
 
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=False)
