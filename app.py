@@ -6,6 +6,12 @@ from datetime import datetime
 from flask import Flask, render_template, request, send_file, session, redirect, url_for
 from openpyxl import Workbook
 import tensorflow as tf
+
+# Reduce memory/CPU overhead on constrained hosting (e.g. Render free tier).
+# Safe no-op on machines with more resources; does not change model behavior.
+os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
+tf.config.threading.set_intra_op_parallelism_threads(1)
+tf.config.threading.set_inter_op_parallelism_threads(1)
 import numpy as np
 from tensorflow.keras.utils import load_img, img_to_array
 from werkzeug.utils import secure_filename
