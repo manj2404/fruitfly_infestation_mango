@@ -36,6 +36,42 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 HISTORY_FILE = "prediction_history.xlsx"
 
+# Tamil translations for the History table. Column names and result values
+# (HEALTHY, SAFE, Egg Stage, etc.) are stored in English inside the Excel
+# file itself, so they need a lookup table here rather than a per-row
+# _tamil field like the live result page has. Anything not found in these
+# dicts (e.g. a user's raw email, image filename, or numeric value) is
+# shown as-is in both languages, which is expected.
+HISTORY_COLUMN_TRANSLATIONS = {
+    "Date & Time": "தேதி & நேரம்",
+    "User Name": "பயனர் பெயர்",
+    "User Email": "பயனர் மின்னஞ்சல்",
+    "Image": "படம்",
+    "Prediction": "கணிப்பு",
+    "Confidence (%)": "நம்பகத்தன்மை (%)",
+    "Risk": "ஆபத்து",
+    "Stage": "நிலை",
+    "Location": "இருப்பிடம்",
+    "Max Temp (°C)": "அதிகபட்ச வெப்பநிலை (°C)",
+    "Min Temp (°C)": "குறைந்தபட்ச வெப்பநிலை (°C)",
+    "GDD": "GDD",
+}
+
+HISTORY_VALUE_TRANSLATIONS = {
+    "HEALTHY": "ஆரோக்கியமானது",
+    "INFECTED": "பாதிக்கப்பட்டது",
+    "SAFE": "பாதுகாப்பானது",
+    "MODERATE": "மிதமான ஆபத்து",
+    "HIGH": "அதிக ஆபத்து",
+    "VERY HIGH": "மிக அதிக ஆபத்து",
+    "Egg Stage": "முட்டை நிலை",
+    "Larva Stage": "புழு நிலை",
+    "Pupa Stage": "கூட்டு நிலை",
+    "Adult Stage": "முதிர்ந்த பழ ஈ",
+    "Manual entry": "நேரடி உள்ளீடு",
+    "Entered manually": "நேரடியாக உள்ளிடப்பட்டது",
+}
+
 
 def allowed_file(filename):
     return (
@@ -609,7 +645,9 @@ def history_page():
         "history.html",
         active="history",
         columns=columns,
-        rows=rows
+        rows=rows,
+        column_translations=HISTORY_COLUMN_TRANSLATIONS,
+        value_translations=HISTORY_VALUE_TRANSLATIONS
     )
 
 
